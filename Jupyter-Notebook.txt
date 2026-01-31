@@ -1,0 +1,51 @@
+import pandas as pd
+import json
+import sqlite3
+
+# -----------------------------
+# Step 1: Load Orders (CSV/TXT)
+# -----------------------------
+orders = pd.read_csv("orders.txt", sep="\t")  # adjust separator if needed
+print("Orders loaded:", orders.shape)
+
+# -----------------------------
+# Step 2: Load Users (JSON)
+# -----------------------------
+with open("users.json", "r") as f:
+    users = json.load(f)
+
+users_df = pd.DataFrame(users)
+print("Users loaded:", users_df.shape)
+# -----------------------------
+# Step 3: Load Restaurants (SQL)
+# -----------------------------
+# Create in-memory SQLite DB
+conn = sqlite3.connect(":memory:")
+cursor = conn.cursor()
+
+# Read SQL file
+with open("resturants.txt", "r") as f:
+    sql_script = f.read()
+
+# Execute SQL script to create table and insert data
+cursor.executescript(sql_script)
+
+# Load restaurants into pandas
+restaurants = pd.read_sql_query("SELECT * FROM restaurants;", conn)
+print("Restaurants loaded:", restaurants.shape)
+
+# -----------------------------
+# Step 4: Merge the Data
+# -----------------------------
+# Merge orders with users
+erge with restaurants
+final_dataset = pd.merge(merged1, restaurants, on="restaurant_id", how="left")
+
+print("Final dataset shape:", final_dataset.shape)
+
+# -----------------------------
+# Step 5: Save Final Dataset
+# -----------------------------
+final_dataset.to_csv("final_food_delivery_dataset.csv", index=False)
+print("✅ Final dataset saved as final_food_delivery_dataset.csv")
+
